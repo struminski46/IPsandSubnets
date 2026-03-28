@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Sub-redes IPv4 — CCNA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3445;
+    --accent: #00d4aa;
+    --accent2: #ff6b35;
+    --accent3: #4d9fff;
+    --accent4: #f5a623;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --network: #4d9fff;
+    --subnet: #00d4aa;
+    --host: #ff6b35;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0d1117 0%, #1a2540 50%, #0d2030 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 50%, rgba(77,159,255,.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 30% at 70% 50%, rgba(0,212,170,.07) 0%, transparent 70%);
+  }
+  header .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .7rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: .2rem .7rem;
+    border-radius: 2px;
+    letter-spacing: .1em;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    position: relative;
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+  header p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-top: .7rem;
+    position: relative;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: .75rem 2rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .85rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    transition: color .2s;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  section {
+    margin-bottom: 3rem;
+    scroll-margin-top: 70px;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 1.5rem;
+  }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .75rem;
+    color: var(--accent);
+    background: rgba(0,212,170,.1);
+    border: 1px solid rgba(0,212,170,.3);
+    padding: .25rem .6rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: .75rem;
+  }
+  .card p, .card li { font-size: .9rem; color: #c9d1d9; }
+  .card ul { padding-left: 1.2rem; }
+  .card li { margin-bottom: .3rem; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:620px){ .grid-2 { grid-template-columns: 1fr; } }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+  @media(max-width:700px){ .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ── HIGHLIGHT CARD ── */
+  .card-accent {
+    background: linear-gradient(135deg, rgba(0,212,170,.07), rgba(0,212,170,.02));
+    border-color: rgba(0,212,170,.3);
+  }
+  .card-blue {
+    background: linear-gradient(135deg, rgba(77,159,255,.07), rgba(77,159,255,.02));
+    border-color: rgba(77,159,255,.3);
+  }
+  .card-orange {
+    background: linear-gradient(135deg, rgba(255,107,53,.07), rgba(255,107,53,.02));
+    border-color: rgba(255,107,53,.3);
+  }
+  .card-yellow {
+    background: linear-gradient(135deg, rgba(245,166,35,.07), rgba(245,166,35,.02));
+    border-color: rgba(245,166,35,.3);
+  }
+
+  /* ── ADDRESS DIAGRAM ── */
+  .addr-bar {
+    display: flex;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .8rem;
+    margin: 1rem 0;
+    height: 48px;
+  }
+  .addr-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    letter-spacing: .03em;
+    flex-shrink: 0;
+    padding: 0 .5rem;
+    text-align: center;
+    min-width: 0;
+  }
+  .seg-net  { background: rgba(77,159,255,.25); border: 1px solid rgba(77,159,255,.5); color: var(--network); }
+  .seg-sub  { background: rgba(0,212,170,.25);  border: 1px solid rgba(0,212,170,.5);  color: var(--subnet);  }
+  .seg-host { background: rgba(255,107,53,.25); border: 1px solid rgba(255,107,53,.5); color: var(--host);   }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: .8rem;
+    margin-top: .5rem;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 2px;
+  }
+
+  /* ── MONO TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+    font-family: 'IBM Plex Mono', monospace;
+    margin: 1rem 0;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: .75rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: .6rem .9rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: .55rem .9rem;
+    border-bottom: 1px solid rgba(42,52,69,.5);
+    color: #c9d1d9;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .td-accent { color: var(--accent); font-weight: 600; }
+  .td-blue   { color: var(--accent3); font-weight: 600; }
+  .td-orange { color: var(--accent2); font-weight: 600; }
+
+  /* ── FORMULA BOX ── */
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: .9rem 1.2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    margin: .75rem 0;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .formula-label {
+    font-size: .7rem;
+    color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: .25rem;
+  }
+
+  /* ── RULE BLOCK ── */
+  .rule-block {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: .75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: .5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .rule-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+  .rule-block p { font-size: .88rem; color: #c9d1d9; }
+  .rule-block strong { color: var(--text); }
+
+  /* ── STEP LIST ── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: .75rem;
+    padding: .75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: .75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-top: .1rem;
+  }
+  .step p { font-size: .88rem; color: #c9d1d9; }
+  .step p strong { color: var(--text); }
+
+  /* ── OCTET VISUAL ── */
+  .octet-row {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin: .4rem 0;
+    flex-wrap: wrap;
+  }
+  .octet-box {
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    padding: .3rem .7rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .85rem;
+    min-width: 60px;
+    text-align: center;
+  }
+  .octet-label {
+    font-size: .72rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    min-width: 40px;
+    text-align: right;
+  }
+  .arrow-right {
+    color: var(--muted);
+    font-size: .9rem;
+  }
+
+  /* ── MASK TABLE ── */
+  .mask-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: .3rem .75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .8rem;
+    align-items: center;
+  }
+  .mask-head { color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* ── PRIVATE TABLE ── */
+  .private-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: .5rem 1rem;
+    padding: .6rem .9rem;
+    border-bottom: 1px solid rgba(42,52,69,.4);
+    font-size: .85rem;
+    align-items: center;
+  }
+  .private-row:last-child { border-bottom: none; }
+  .class-badge {
+    display: inline-block;
+    padding: .1rem .5rem;
+    border-radius: 3px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: .8rem;
+  }
+  .cb-a { background: rgba(77,159,255,.2); color: var(--accent3); border: 1px solid rgba(77,159,255,.4); }
+  .cb-b { background: rgba(0,212,170,.2); color: var(--accent);  border: 1px solid rgba(0,212,170,.4); }
+  .cb-c { background: rgba(255,107,53,.2); color: var(--accent2); border: 1px solid rgba(255,107,53,.4); }
+
+  /* ── INFO NOTE ── */
+  .note {
+    background: rgba(245,166,35,.07);
+    border: 1px solid rgba(245,166,35,.3);
+    border-radius: 6px;
+    padding: .75rem 1rem;
+    font-size: .85rem;
+    color: #c9d1d9;
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+    margin: .75rem 0;
+  }
+  .note-icon { flex-shrink: 0; }
+
+  /* ── DIVIDER ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* ── MAGIC NUMBER DEMO ── */
+  .magic-demo {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .82rem;
+    line-height: 2;
+  }
+  .magic-demo .ml { color: var(--muted); display: inline-block; width: 140px; }
+  .magic-demo .mv { color: var(--accent4); }
+  .magic-demo .mr { color: var(--accent); }
+  .magic-demo .mip{ color: var(--accent3); }
+
+  /* ── SUMMARY TABLE ── */
+  .summary-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .summary-card table { margin: 0; }
+  .summary-card th { background: rgba(0,212,170,.08); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: .8rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">CCNA 200-301 · Capítulos 11–14</div>
+  <h1>Guia de <span>Sub-redes IPv4</span></h1>
+  <p>Conceitos essenciais de endereçamento e subnetting para a prova CCNA</p>
+</header>
+
+<nav>
+  <a href="#conceito">O que é Subnet</a>
+  <a href="#classes">Classes IPv4</a>
+  <a href="#estrutura">Estrutura do Endereço</a>
+  <a href="#mascara">Máscara</a>
+  <a href="#privados">IPs Privados</a>
+  <a href="#calculos">Cálculos</a>
+  <a href="#subnet-id">Encontrar Subnet ID</a>
+  <a href="#referencia">Referência Rápida</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 1. O QUE É UMA SUB-REDE -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="conceito">
+  <div class="section-title">
+    <span class="section-num">01</span>
+    <h2>O que é uma Sub-rede (Subnet)?</h2>
+  </div>
+
+  <div class="card card-blue">
+    <p>Uma <strong>rede IP classful</strong> (Classe A, B ou C) é um bloco enorme de endereços consecutivos. Como um sanduíche de 2 km — muito grande para usar inteiro. A solução é <strong>fatiar</strong> essa rede em pedaços menores chamados <em>sub-redes</em>.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="rule-block">
+      <span class="rule-icon">🔒</span>
+      <p><strong>Regra 1 —</strong> Endereços <em>no mesmo</em> link (LAN, VLAN, WAN ponto-a-ponto) ficam na <strong>mesma</strong> sub-rede.</p>
+    </div>
+    <div class="rule-block">
+      <span class="rule-icon">🔀</span>
+      <p><strong>Regra 2 —</strong> Endereços em links <em>diferentes</em> ficam em sub-redes <strong>diferentes</strong>, separados por pelo menos um roteador.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Onde é necessária uma sub-rede?</h3>
+    <ul>
+      <li>Cada <strong>VLAN</strong> → 1 sub-rede</li>
+      <li>Cada <strong>link serial ponto-a-ponto</strong> → 1 sub-rede</li>
+      <li>Cada <strong>link Ethernet WAN (EoMPLS)</strong> → 1 sub-rede</li>
+    </ul>
+    <div class="note" style="margin-top:.75rem;">
+      <span class="note-icon">💡</span>
+      <span>Exemplo: rede com 1 site central (12 VLANs) + 3 filiais (2 VLANs cada) + 3 links WAN = <strong>12 + 6 + 3 = 21 sub-redes</strong>.</span>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 2. CLASSES IPv4 -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="classes">
+  <div class="section-title">
+    <span class="section-num">02</span>
+    <h2>Classes de Endereços IPv4</h2>
+  </div>
+
+  <div class="summary-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Classe</th>
+          <th>1º Octeto</th>
+          <th>Uso</th>
+          <th>Redes</th>
+          <th>Hosts/Rede</th>
+          <th>Máscara Padrão</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="class-badge cb-a">A</span></td>
+          <td class="td-blue">1 – 126</td>
+          <td>Unicast (grandes)</td>
+          <td>126</td>
+          <td>16.777.214</td>
+          <td class="td-accent">255.0.0.0</td>
+        </tr>
+        <tr>
+          <td><span class="class-badge cb-b">B</span></td>
+          <td class="td-accent">128 – 191</td>
+          <td>Unicast (médias)</td>
+          <td>16.384</td>
+          <td>65.534</td>
+          <td class="td-accent">255.255.0.0</td>
+        </tr>
+        <tr>
+          <td><span class="class-badge cb-c">C</span></td>
+          <td class="td-orange">192 – 223</td>
+          <td>Unicast (pequenas)</td>
+          <td>2.097.152</td>
+          <td>254</td>
+          <td class="td-accent">255.255.255.0</td>
+        </tr>
+        <tr>
+          <td>D</td>
+          <td class="td-orange" style="color:var(--muted)">224 – 239</td>
+          <td>Multicast</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>E</td>
+          <td style="color:var(--muted)">240 – 255</td>
+          <td>Reservado</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="note-icon">⚠️</span>
+    <span>Os intervalos <strong>0.x.x.x</strong> e <strong>127.x.x.x</strong> são reservados (127.0.0.1 = loopback). Por isso a Classe A tem 126 redes, não 128.</span>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 3. ESTRUTURA DO ENDEREÇO -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="estrutura">
+  <div class="section-title">
+    <span class="section-num">03</span>
+    <h2>Estrutura do Endereço IPv4</h2>
+  </div>
+
+  <div class="card">
+    <p style="margin-bottom:1rem;">Um endereço IPv4 tem <strong>32 bits</strong>. Dependendo do contexto, pode ser visto com 2 ou 3 partes:</p>
+
+    <p class="formula-label">Visão Classless (2 partes)</p>
+    <div class="addr-bar">
+      <div class="addr-seg seg-net" style="flex:2">PREFIXO (P bits)</div>
+      <div class="addr-seg seg-host" style="flex:1">HOST (H bits)</div>
+    </div>
+
+    <p class="formula-label" style="margin-top:1.25rem;">Visão Classful (3 partes) — N + S + H = 32</p>
+    <div class="addr-bar">
+      <div class="addr-seg seg-net" style="flex:1">REDE (N)</div>
+      <div class="addr-seg seg-sub" style="flex:1">SUBNET (S)</div>
+      <div class="addr-seg seg-host" style="flex:1">HOST (H)</div>
+    </div>
+
+    <div class="legend" style="margin-top:1rem;">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--network)"></div> Rede — definida pela Classe (A=8, B=16, C=24 bits)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--subnet)"></div> Subnet — bits "tomados emprestado" dos bits de host</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--host)"></div> Host — identifica cada dispositivo na sub-rede</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem;">
+    <div class="card card-blue">
+      <h3 style="color:var(--accent3);">Exemplo — Classe A, /24</h3>
+      <div class="addr-bar">
+        <div class="addr-seg seg-net" style="flex:.33">N=8</div>
+        <div class="addr-seg seg-sub" style="flex:.66">S=16</div>
+        <div class="addr-seg seg-host" style="flex:.33">H=8</div>
+      </div>
+      <p style="margin-top:.5rem;font-size:.82rem;">Ex: <code style="color:var(--accent3)">10.1.1.0/24</code></p>
+    </div>
+    <div class="card card-accent">
+      <h3 style="color:var(--accent);">Exemplo — Classe B, /24</h3>
+      <div class="addr-bar">
+        <div class="addr-seg seg-net" style="flex:.5">N=16</div>
+        <div class="addr-seg seg-sub" style="flex:.25">S=8</div>
+        <div class="addr-seg seg-host" style="flex:.25">H=8</div>
+      </div>
+      <p style="margin-top:.5rem;font-size:.82rem;">Ex: <code style="color:var(--accent)">172.16.1.0/24</code></p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Formatos de Máscara</h3>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:.75rem;">Três formas de representar a mesma máscara:</p>
+    <div class="mask-grid">
+      <span class="mask-head">Binário</span>
+      <span class="mask-head">DDN (Decimal Pontilhado)</span>
+      <span class="mask-head">Prefixo (CIDR)</span>
+
+      <span style="color:var(--muted);font-size:.78rem;">11111111.11111111.11111111.00000000</span>
+      <span style="color:var(--accent4);">255.255.255.0</span>
+      <span style="color:var(--accent);">/24</span>
+
+      <span style="color:var(--muted);font-size:.78rem;">11111111.11111111.11000000.00000000</span>
+      <span style="color:var(--accent4);">255.255.192.0</span>
+      <span style="color:var(--accent);">/18</span>
+
+      <span style="color:var(--muted);font-size:.78rem;">11111111.11111111.11111100.00000000</span>
+      <span style="color:var(--accent4);">255.255.252.0</span>
+      <span style="color:var(--accent);">/22</span>
+    </div>
+    <div class="note" style="margin-top:1rem;">
+      <span class="note-icon">📌</span>
+      <span>A máscara em binário <strong>sempre</strong> tem 1s contínuos à esquerda e 0s à direita. Nunca intercalados.</span>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 4. MÁSCARA — CONVERSÃO -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="mascara">
+  <div class="section-title">
+    <span class="section-num">04</span>
+    <h2>Máscara de Sub-rede — Conversão</h2>
+  </div>
+
+  <div class="card">
+    <h3>Os 9 valores possíveis em cada octeto</h3>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem;">Todo octeto de uma máscara válida só pode ter UM destes valores:</p>
+    <table>
+      <thead><tr><th>Binário</th><th>Decimal</th><th>Bits 1</th></tr></thead>
+      <tbody>
+        <tr><td>00000000</td><td class="td-orange">0</td><td>0</td></tr>
+        <tr><td>10000000</td><td class="td-orange">128</td><td>1</td></tr>
+        <tr><td>11000000</td><td class="td-orange">192</td><td>2</td></tr>
+        <tr><td>11100000</td><td class="td-orange">224</td><td>3</td></tr>
+        <tr><td>11110000</td><td class="td-orange">240</td><td>4</td></tr>
+        <tr><td>11111000</td><td class="td-orange">248</td><td>5</td></tr>
+        <tr><td>11111100</td><td class="td-orange">252</td><td>6</td></tr>
+        <tr><td>11111110</td><td class="td-orange">254</td><td>7</td></tr>
+        <tr><td>11111111</td><td class="td-orange">255</td><td>8</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem;">
+    <div class="card">
+      <h3>DDN → Prefixo</h3>
+      <p style="font-size:.85rem;">Some os bits 1 de cada octeto.</p>
+      <div class="magic-demo" style="margin-top:.5rem;">
+        <span class="ml">255.255.240.0 →</span>
+        <span class="mv">8 + 8 + 4 + 0</span><span class="mr"> = /20</span>
+      </div>
+      <div class="magic-demo">
+        <span class="ml">255.255.255.252 →</span>
+        <span class="mv">8+8+8+6</span><span class="mr"> = /30</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Prefixo → DDN</h3>
+      <p style="font-size:.85rem;">Escreva P bits "1" e complete com "0" até 32 bits.</p>
+      <div class="magic-demo" style="margin-top:.5rem;">
+        <span class="ml">/18 →</span>
+        <span class="mv">8+8+2+0</span><span class="mr"> = 255.255.192.0</span>
+      </div>
+      <div class="magic-demo">
+        <span class="ml">/27 →</span>
+        <span class="mv">8+8+8+3</span><span class="mr"> = 255.255.255.224</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 5. IPS PRIVADOS (RFC 1918) -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="privados">
+  <div class="section-title">
+    <span class="section-num">05</span>
+    <h2>Endereços IP Privados (RFC 1918)</h2>
+  </div>
+
+  <div class="card card-yellow">
+    <p>A Internet ficou sem endereços IPv4 públicos. A solução: <strong>NAT + IPs Privados</strong>. Empresas podem reutilizar os mesmos endereços internamente porque o NAT traduz para IPs públicos na saída para a Internet.</p>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <div class="private-row" style="border-bottom:1px solid var(--border);padding:.4rem .9rem;">
+      <span style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;">Classe</span>
+      <span style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;">Redes Privadas</span>
+      <span style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;"># Redes</span>
+    </div>
+    <div class="private-row">
+      <span class="class-badge cb-a">A</span>
+      <span>10.0.0.0</span>
+      <span class="td-blue">1</span>
+    </div>
+    <div class="private-row">
+      <span class="class-badge cb-b">B</span>
+      <span>172.16.0.0 → 172.31.0.0</span>
+      <span class="td-accent">16</span>
+    </div>
+    <div class="private-row">
+      <span class="class-badge cb-c">C</span>
+      <span>192.168.0.0 → 192.168.255.0</span>
+      <span class="td-orange">256</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="note-icon">💡</span>
+    <span>Cerca de 50% das empresas usam a rede privada Classe A <strong>10.0.0.0</strong> — mesmo sendo gigante, não há penalidade por escolhê-la para uma rede pequena.</span>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 6. CÁLCULOS FUNDAMENTAIS -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="calculos">
+  <div class="section-title">
+    <span class="section-num">06</span>
+    <h2>Cálculos Fundamentais</h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-orange">
+      <div class="formula-label">Hosts utilizáveis por sub-rede</div>
+      <div class="formula-box" style="border-left-color:var(--accent2)">
+        2<sup>H</sup> − 2
+      </div>
+      <p style="font-size:.85rem;">H = número de bits de host. Subtrai 2 porque o <strong>menor número</strong> = Subnet ID e o <strong>maior número</strong> = Broadcast — ambos reservados.</p>
+    </div>
+    <div class="card card-accent">
+      <div class="formula-label">Número de sub-redes (1 máscara)</div>
+      <div class="formula-box">
+        2<sup>S</sup>
+      </div>
+      <p style="font-size:.85rem;">S = bits de subnet (bits emprestados dos bits de host). Só válido quando <strong>uma única máscara</strong> é usada em toda a rede classful.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Exemplo: Rede 172.16.0.0, máscara /24</h3>
+    <div class="addr-bar" style="margin:1rem 0;">
+      <div class="addr-seg seg-net" style="flex:.5">N = 16</div>
+      <div class="addr-seg seg-sub" style="flex:.25">S = 8</div>
+      <div class="addr-seg seg-host" style="flex:.25">H = 8</div>
+    </div>
+    <div class="grid-2" style="gap:.5rem;">
+      <div class="magic-demo">
+        <span class="ml">Hosts/subnet:</span>
+        <span class="mv">2⁸ − 2</span><span class="mr"> = 254</span>
+      </div>
+      <div class="magic-demo">
+        <span class="ml">Sub-redes:</span>
+        <span class="mv">2⁸</span><span class="mr"> = 256</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Escolhendo a máscara — Exemplo Prático</h3>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:.75rem;">Precisa: 200 sub-redes e 200 hosts/sub-rede na rede Classe B 172.16.0.0</p>
+    <div class="steps">
+      <div class="step"><p><strong>Bits de subnet (S):</strong> 2⁷=128 (insuficiente) → 2⁸=<strong>256 ✓</strong> → S=8</p></div>
+      <div class="step"><p><strong>Bits de host (H):</strong> 2⁷−2=126 (insuficiente) → 2⁸−2=<strong>254 ✓</strong> → H=8</p></div>
+      <div class="step"><p><strong>Verificação:</strong> N+S+H = 16+8+8 = 32 bits ✓</p></div>
+      <div class="step"><p><strong>Máscara resultante:</strong> 16 uns + 8 uns + 8 zeros = <code style="color:var(--accent)">255.255.255.0 (/24)</code></p></div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 7. ENCONTRAR SUBNET ID E BROADCAST -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="subnet-id">
+  <div class="section-title">
+    <span class="section-num">07</span>
+    <h2>Encontrar Subnet ID e Broadcast</h2>
+  </div>
+
+  <div class="card">
+    <h3>Conceito: o que define uma sub-rede</h3>
+    <ul style="font-size:.88rem;color:#c9d1d9;">
+      <li><strong>Subnet ID (menor número):</strong> identifica a sub-rede, não pode ser atribuído a hosts</li>
+      <li><strong>Broadcast (maior número):</strong> enviado a todos os hosts da sub-rede, também reservado</li>
+      <li><strong>Range utilizável:</strong> Subnet ID + 1 até Broadcast − 1</li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Método Decimal — Máscara Fácil (só 255 e 0)</h3>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem;">Para máscaras como 255.0.0.0, 255.255.0.0, 255.255.255.0:</p>
+    <div class="grid-2" style="gap:.5rem;">
+      <div>
+        <p class="formula-label">Subnet ID</p>
+        <div class="rule-block" style="margin-bottom:.3rem;"><span class="rule-icon" style="font-size:1rem;">255</span><p>Copie o octeto do endereço IP</p></div>
+        <div class="rule-block"><span class="rule-icon" style="font-size:1rem;">0</span><p>Escreva 0</p></div>
+      </div>
+      <div>
+        <p class="formula-label">Broadcast</p>
+        <div class="rule-block" style="margin-bottom:.3rem;"><span class="rule-icon" style="font-size:1rem;">255</span><p>Copie o octeto do endereço IP</p></div>
+        <div class="rule-block"><span class="rule-icon" style="font-size:1rem;">0</span><p>Escreva 255</p></div>
+      </div>
+    </div>
+    <div class="magic-demo" style="margin-top:.75rem;">
+      <div><span class="ml">IP:</span><span class="mip">10.77.55.3</span><span class="ml" style="margin-left:.5rem;">Máscara:</span><span class="mv">255.255.255.0</span></div>
+      <div><span class="ml">Subnet ID:</span><span class="mr">10.77.55.0</span></div>
+      <div><span class="ml">Broadcast:</span><span class="mr">10.77.55.255</span></div>
+      <div><span class="ml">Range:</span><span class="mr">10.77.55.1 → 10.77.55.254</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Método Decimal — Máscara Difícil (octeto de interesse)</h3>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem;">Quando há um octeto que não é 0 nem 255, esse é o <strong>octeto de interesse</strong>:</p>
+
+    <div class="steps">
+      <div class="step"><p>Se máscara = <strong>255</strong>: copie o octeto do IP</p></div>
+      <div class="step"><p>Se máscara = <strong>0</strong>: escreva 0 (Subnet ID) ou 255 (Broadcast)</p></div>
+      <div class="step"><p>Se outro valor: calcule o <strong>número mágico</strong> = 256 − máscara</p></div>
+      <div class="step"><p><strong>Subnet ID do octeto:</strong> maior múltiplo do número mágico ≤ valor do IP nesse octeto</p></div>
+      <div class="step"><p><strong>Broadcast do octeto:</strong> Subnet ID + número mágico − 1</p></div>
+    </div>
+
+    <div class="note" style="margin-top:.5rem;">
+      <span class="note-icon">🔢</span>
+      <span>O número mágico é o tamanho de cada sub-rede no octeto de interesse. Os subnet IDs são sempre múltiplos desse número: 0, N, 2N, 3N…</span>
+    </div>
+
+    <div class="magic-demo" style="margin-top:.75rem;">
+      <div><span class="ml">IP:</span><span class="mip">192.168.5.77</span><span class="ml" style="margin-left:.5rem;">Máscara:</span><span class="mv">255.255.255.224</span></div>
+      <div><span class="ml">Octeto interes.:</span><span class="mv">4º (valor IP=77)</span></div>
+      <div><span class="ml">Nº mágico:</span><span class="mv">256 − 224 = 32</span></div>
+      <div><span class="ml">Múltiplos:</span><span class="mv">0, 32, 64, 96, 128…</span></div>
+      <div><span class="ml">≤77 mais próx.:</span><span class="mr">64</span></div>
+      <div><span class="ml">Subnet ID:</span><span class="mr">192.168.5.64</span></div>
+      <div><span class="ml">Broadcast:</span><span class="mr">192.168.5.(64+32−1) = 192.168.5.95</span></div>
+      <div><span class="ml">Range:</span><span class="mr">192.168.5.65 → 192.168.5.94</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Exemplo Completo — Passo a Passo</h3>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem;">IP: <code style="color:var(--accent3)">130.4.102.1</code> &nbsp;/&nbsp; Máscara: <code style="color:var(--accent4)">255.255.240.0</code></p>
+    <table>
+      <thead><tr><th>Octeto</th><th>Máscara</th><th>Ação</th><th>Subnet ID</th><th>Broadcast</th></tr></thead>
+      <tbody>
+        <tr><td>1º → 130</td><td>255</td><td>Copiar</td><td class="td-accent">130</td><td class="td-accent">130</td></tr>
+        <tr><td>2º → 4</td><td>255</td><td>Copiar</td><td class="td-accent">4</td><td class="td-accent">4</td></tr>
+        <tr><td>3º → 102</td><td>240</td><td>Mágico: 256−240=16 &nbsp;|&nbsp; ≤102 → 96</td><td class="td-accent">96</td><td class="td-accent">96+16−1=111</td></tr>
+        <tr><td>4º → 1</td><td>0</td><td>Zero / 255</td><td class="td-accent">0</td><td class="td-accent">255</td></tr>
+      </tbody>
+    </table>
+    <div class="magic-demo" style="margin-top:.75rem;">
+      <div><span class="ml">Subnet ID:</span><span class="mr">130.4.96.0</span></div>
+      <div><span class="ml">Broadcast:</span><span class="mr">130.4.111.255</span></div>
+      <div><span class="ml">Range:</span><span class="mr">130.4.96.1 → 130.4.111.254</span></div>
+      <div><span class="ml">Total hosts:</span><span class="mr">2¹² − 2 = 4094</span></div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 8. REFERÊNCIA RÁPIDA -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="referencia">
+  <div class="section-title">
+    <span class="section-num">08</span>
+    <h2>Referência Rápida — Todas as Máscaras</h2>
+  </div>
+
+  <div class="summary-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Prefixo</th>
+          <th>DDN (octeto interessante)</th>
+          <th>Nº Mágico</th>
+          <th>Hosts/Subnet</th>
+          <th>Subnets (Cl.A)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-accent">/24</td><td>255.255.255.<strong>0</strong></td><td>—</td><td class="td-orange">254</td><td>65.536</td></tr>
+        <tr><td class="td-accent">/25</td><td>255.255.255.<strong>128</strong></td><td class="td-blue">128</td><td class="td-orange">126</td><td>131.072</td></tr>
+        <tr><td class="td-accent">/26</td><td>255.255.255.<strong>192</strong></td><td class="td-blue">64</td><td class="td-orange">62</td><td>262.144</td></tr>
+        <tr><td class="td-accent">/27</td><td>255.255.255.<strong>224</strong></td><td class="td-blue">32</td><td class="td-orange">30</td><td>524.288</td></tr>
+        <tr><td class="td-accent">/28</td><td>255.255.255.<strong>240</strong></td><td class="td-blue">16</td><td class="td-orange">14</td><td>—</td></tr>
+        <tr><td class="td-accent">/29</td><td>255.255.255.<strong>248</strong></td><td class="td-blue">8</td><td class="td-orange">6</td><td>—</td></tr>
+        <tr><td class="td-accent">/30</td><td>255.255.255.<strong>252</strong></td><td class="td-blue">4</td><td class="td-orange">2</td><td>—</td></tr>
+        <tr><td class="td-accent">/22</td><td>255.255.<strong>252</strong>.0</td><td class="td-blue">4</td><td class="td-orange">1022</td><td>—</td></tr>
+        <tr><td class="td-accent">/23</td><td>255.255.<strong>254</strong>.0</td><td class="td-blue">2</td><td class="td-orange">510</td><td>—</td></tr>
+        <tr><td class="td-accent">/20</td><td>255.255.<strong>240</strong>.0</td><td class="td-blue">16</td><td class="td-orange">4094</td><td>—</td></tr>
+        <tr><td class="td-accent">/18</td><td>255.255.<strong>192</strong>.0</td><td class="td-blue">64</td><td class="td-orange">16.382</td><td>—</td></tr>
+        <tr><td class="td-accent">/16</td><td>255.255.0.0</td><td>—</td><td class="td-orange">65.534</td><td>256</td></tr>
+        <tr><td class="td-accent">/8</td><td>255.0.0.0</td><td>—</td><td class="td-orange">16.777.214</td><td>1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-3" style="margin-top:1.5rem;">
+    <div class="card card-blue">
+      <h3 style="color:var(--accent3);font-size:.9rem;">🧠 Fórmulas-Chave</h3>
+      <p style="font-size:.82rem;margin-top:.5rem;">Hosts = <strong>2<sup>H</sup> − 2</strong><br>Subnets = <strong>2<sup>S</sup></strong><br>Mágico = <strong>256 − máscara</strong><br>N + S + H = <strong>32</strong></p>
+    </div>
+    <div class="card card-accent">
+      <h3 style="color:var(--accent);font-size:.9rem;">🔢 Potências de 2</h3>
+      <p style="font-family:'IBM Plex Mono',monospace;font-size:.78rem;margin-top:.5rem;line-height:1.8;">
+        2²=4 &nbsp;·&nbsp; 2³=8<br>
+        2⁴=16 &nbsp;·&nbsp; 2⁵=32<br>
+        2⁶=64 &nbsp;·&nbsp; 2⁷=128<br>
+        2⁸=256 &nbsp;·&nbsp; 2¹⁰=1024
+      </p>
+    </div>
+    <div class="card card-orange">
+      <h3 style="color:var(--accent2);font-size:.9rem;">⚡ Regras Rápidas</h3>
+      <p style="font-size:.82rem;margin-top:.5rem;">Máscara 255 → copie o IP<br>Máscara 0 → subnet=0, bcast=255<br>Outro → calcule o Nº Mágico<br>/30 → só 2 hosts (links WAN)</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Resumo baseado nos Capítulos 11–14 do CCNA 200-301 Official Cert Guide, Volume 1 &nbsp;·&nbsp; Technet24
+</footer>
+
+</body>
+</html>
